@@ -1,0 +1,177 @@
+package {{.TableName}}_handler
+
+import (
+	"{{.ProjectName}}/api/define"
+	"strings"
+	errs "{{.ProjectName}}/api/error"
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/service/interfaces"
+	"github.com/gin-gonic/gin"
+)
+
+func Get{{.ModelName}}Handler(ss interfaces.{{.ModelName}}Service) ({{.ModelName}}HandlerInterface, error) {
+	return &{{.ModelName}}Handler{
+		service: ss,
+	}, nil
+}
+
+type {{.ModelName}}Handler struct {
+	service interfaces.{{.ModelName}}Service
+}
+
+// SelectById 根据id获取
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) SelectById(ctx *gin.Context) {
+
+	// 获取请求参数
+	id := ctx.Query("id")
+	if id == "" {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 执行查询
+	resp, err := {{.ModelNameHump}}Handler.service.SelectById(id)
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}
+
+// SelectList 查询列表
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) SelectList(ctx *gin.Context) {
+
+	// 获取请求参数
+	{{.ModelNameHump}} := model.{{.ModelName}}{}
+	if err := ctx.ShouldBind(&{{.ModelNameHump}}); err != nil {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 执行查询
+	resp, err := {{.ModelNameHump}}Handler.service.SelectList(&{{.ModelNameHump}})
+
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}
+
+// SelectPage 分页查询
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) SelectPage(ctx *gin.Context) {
+
+	// 获取分页参数
+	basePageRequest := define.BasePageRequest{}
+	if err := ctx.ShouldBind(&basePageRequest); err != nil {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 获取筛选参数
+	{{.ModelNameHump}} := model.{{.ModelName}}{}
+	if err := ctx.ShouldBind(&{{.ModelNameHump}}); err != nil {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 执行查询
+	resp, err := {{.ModelNameHump}}Handler.service.SelectPage(&basePageRequest, &{{.ModelNameHump}})
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}
+
+// Insert 插入
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) Insert(ctx *gin.Context) {
+
+	// 获取请求参数
+	{{.ModelNameHump}} := model.{{.ModelName}}{}
+	if err := ctx.ShouldBind(&{{.ModelNameHump}}); err != nil {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 执行插入
+	resp, err := {{.ModelNameHump}}Handler.service.Insert(&{{.ModelNameHump}})
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}
+
+// UpdateById 修改
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) UpdateById(ctx *gin.Context) {
+
+	// 获取请求参数
+	{{.ModelNameHump}} := model.{{.ModelName}}{}
+	if err := ctx.ShouldBind(&{{.ModelNameHump}}); err != nil {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 执行修改
+	resp, err := {{.ModelNameHump}}Handler.service.UpdateById(&{{.ModelNameHump}})
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}
+
+// DeleteById 根据id删除
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) DeleteById(ctx *gin.Context) {
+
+	// 获取请求参数
+	id := ctx.Query("id")
+	if id == "" {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	// 执行删除
+	resp, err := {{.ModelNameHump}}Handler.service.DeleteById(id)
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}
+
+// DeleteBatchIds 根据id集合删除
+func ({{.ModelNameHump}}Handler *{{.ModelName}}Handler) DeleteBatchIds(ctx *gin.Context) {
+
+	// 获取请求参数
+	idStr := ctx.Query("ids")
+	if idStr == "" {
+		ctx.JSON(errs.ErrResp(errs.ParamErr))
+		return
+	}
+
+	ids := strings.Split(idStr, ",")
+
+	// 执行批量删除
+	resp, err := {{.ModelNameHump}}Handler.service.DeleteBatchIds(ids)
+	if err != nil {
+		ctx.JSON(errs.ErrResp(err))
+		return
+	}
+
+	ctx.PureJSON(errs.SucResp(resp))
+	return
+}

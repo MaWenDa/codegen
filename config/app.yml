@@ -1,0 +1,11 @@
+app: codegen
+db:
+  databases:
+    codegen:
+      dialect: mysql
+      master:
+        dsn: root:root@tcp(127.0.0.1:3306)/codegen?charset=utf8mb4&parseTime=true&loc=Local
+log:
+  outputs:
+    - stdout
+    - ./logs/codegen.log

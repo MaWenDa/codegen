@@ -1,0 +1,16 @@
+package model
+
+import "time"
+
+const (
+
+	// {{.ModelName}}TableName {{.TableComment}}
+	{{.ModelName}}TableName = "{{.TableName}}"
+)
+
+// {{.ModelName}} {{.TableComment}}
+type {{.ModelName}} struct {
+    {{ range .ColumnModels }}
+    {{.ColumnModelName}} {{.ColumnType}} `gorm:"column:{{.ColumnName}}" json:"{{.ColumnNameHump}}" form:"{{.ColumnNameHump}}"` // {{.ColumnComment}}
+    {{ end }}
+}

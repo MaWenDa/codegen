@@ -1,0 +1,195 @@
+package {{.TableName}}
+
+import (
+	"{{.ProjectName}}/api/define"
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/pkg/db"
+	"gorm.io/gorm"
+	"time"
+)
+
+func New() (*Dao, error) {
+	return &Dao{db: db.Get("{{.DatabaseName}}")}, nil
+}
+
+type Dao struct {
+	db *db.Group
+}
+
+// SelectById 根据id查询
+func (dao *Dao) SelectById(id string) *model.{{.ModelName}} {
+
+	{{.ModelNameHump}} := model.{{.ModelName}}{}
+
+	dao.StructureSession().
+		Where("id = ?", id).
+		Find(&{{.ModelNameHump}})
+
+	return &{{.ModelNameHump}}
+}
+
+// SelectBatchIds 根据id集合查询
+func (dao *Dao) SelectBatchIds(ids *[]string) *[]model.{{.ModelName}} {
+
+	list := make([]model.{{.ModelName}}, 0)
+
+	if len(*ids) > 0 {
+		dao.StructureSession().
+			Where("in (?)", ids).
+			Find(&list)
+	}
+
+	return &list
+}
+
+// SelectList 查询列表
+func (dao *Dao) SelectList({{.ModelNameHump}} *model.{{.ModelName}}) *[]model.{{.ModelName}} {
+
+	list := make([]model.{{.ModelName}}, 0)
+
+	session := dao.StructureWhere({{.ModelNameHump}})
+
+	session.Order(define.DefaultOrder)
+	    .Find(&list)
+
+	return &list
+}
+
+// SelectCount 查询数量
+func (dao *Dao) SelectCount({{.ModelNameHump}} *model.{{.ModelName}}) int64 {
+
+	count := int64(0)
+
+	session := dao.StructureWhere({{.ModelNameHump}})
+
+	session.Count(&count)
+
+	return count
+}
+
+// SelectPage 分页查询
+func (dao *Dao) SelectPage({{.ModelNameHump}} *model.{{.ModelName}}, current, size int) *[]model.{{.ModelName}} {
+
+	list := make([]model.{{.ModelName}}, 0)
+
+	total := dao.SelectCount({{.ModelNameHump}})
+
+	if total == 0 {
+		return &list
+	}
+
+	// 计算分页参数
+	offset := define.LimitParam(total, current, size)
+
+	session := dao.StructureWhere({{.ModelNameHump}})
+
+	session.Order(define.DefaultOrder).
+		Offset(offset).
+		Limit(size).
+		Find(&list)
+
+	return &list
+}
+
+// Insert 插入
+func (dao *Dao) Insert({{.ModelNameHump}} *model.{{.ModelName}}) bool {
+
+	session := dao.StructureSessionByClient(dao.db.Master())
+
+	{{.ModelNameHump}}.CreateTime = time.Now()
+	{{.ModelNameHump}}.UpdateTime = time.Now()
+
+	session.Create({{.ModelNameHump}})
+
+	return true
+}
+
+// InsertBatchesByLength 批量插入
+func (dao *Dao) InsertBatchesByLength({{.ModelNameHump}}List []*model.{{.ModelName}}, length int) bool {
+
+	session := dao.StructureSessionByClient(dao.db.Master())
+
+	session.CreateInBatches({{.ModelNameHump}}List, length).Set("create_time", time.Now())
+
+	return true
+}
+
+// UpdateById 根据id更新
+func (dao *Dao) UpdateById({{.ModelNameHump}} *model.{{.ModelName}}) bool {
+
+	if {{.ModelNameHump}}.Id == 0 {
+		return dao.Insert({{.ModelNameHump}})
+	}
+
+	session := dao.StructureSessionByClient(dao.db.Master())
+
+	{{.ModelNameHump}}.UpdateTime = time.Now()
+
+	session.Where("id = ?", {{.ModelNameHump}}.Id).
+		Updates({{.ModelNameHump}})
+
+	return true
+}
+
+// DeleteById 根据id删除
+func (dao *Dao) DeleteById(id string) bool {
+
+	if id == "" {
+		return false
+	}
+
+	session := dao.StructureSessionByClient(dao.db.Master())
+
+	session.Where("id = ?", id).
+		Delete(&model.{{.ModelName}}{})
+
+	return true
+}
+
+// DeleteBatchIds 批量删除
+func (dao *Dao) DeleteBatchIds(ids []string) bool {
+
+	if len(ids) == 0 {
+		return false
+	}
+
+	session := dao.StructureSessionByClient(dao.db.Master())
+
+	session.Where("id in (?)", ids).
+		Delete(&model.{{.ModelName}}{})
+
+	return true
+}
+
+// StructureSession 构建Session
+func (dao *Dao) StructureSession() *gorm.DB {
+
+	session := dao.db.Slave().
+		Table(model.{{.ModelName}}TableName).
+		Model(&model.{{.ModelName}}{})
+
+	return session
+}
+
+// StructureSessionByClient 构建Session
+func (dao *Dao) StructureSessionByClient(client *db.Client) *gorm.DB {
+
+	session := client.
+		Table(model.{{.ModelName}}TableName).
+		Model(&model.{{.ModelName}}{})
+
+	return session
+}
+
+// StructureWhere 构建Where
+func (dao *Dao) StructureWhere({{.ModelNameHump}} *model.{{.ModelName}}) *gorm.DB {
+
+	session := dao.StructureSession()
+
+    {{ range .ColumnModels }}
+	if {{.ModelNameHump}}.{{.ColumnModelName}} != '' {
+		session.Where("{{.ColumnName}} = ?", {{.ModelNameHump}}.{{.ColumnModelName}})
+	}
+    {{ end }}
+	return session
+}

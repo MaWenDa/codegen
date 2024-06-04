@@ -1,0 +1,33 @@
+package interfaces
+
+import (
+	"{{.ProjectName}}/api/define"
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/pkg/server/api"
+)
+
+// {{.ModelName}}Service {{.TableComment}}接口
+type {{.ModelName}}Service interface {
+
+	// SelectPage 分页查询
+	SelectPage(pageReq *define.BasePageRequest, {{.ModelNameHump}} *model.{{.ModelName}}) (*define.BasePageResponse, api.Error)
+
+	// SelectById 根据id获取
+	SelectById(id string) (*model.{{.ModelName}}, api.Error)
+
+	// SelectList 查询列表
+	SelectList({{.ModelNameHump}} *model.{{.ModelName}}) (*[]model.{{.ModelName}}, api.Error)
+
+	// Insert 插入
+	Insert({{.ModelNameHump}} *model.{{.ModelName}}) (bool, api.Error)
+
+	// UpdateById 修改
+	UpdateById({{.ModelNameHump}} *model.{{.ModelName}}) (bool, api.Error)
+
+	// DeleteById 根据id删除
+	DeleteById(id string) (bool, api.Error)
+
+	// DeleteBatchIds 根据id集合删除
+	DeleteBatchIds(ids []string) (bool, api.Error)
+}
+

@@ -1,0 +1,29 @@
+package {{.TableName}}_handler
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type {{.ModelName}}HandlerInterface interface {
+
+	// SelectById 根据id获取
+	SelectById(ctx *gin.Context)
+
+	// SelectList 查询列表
+	SelectList(ctx *gin.Context)
+
+	// SelectPage 分页查询
+	SelectPage(ctx *gin.Context)
+
+	// Insert 插入
+	Insert(ctx *gin.Context)
+
+	// UpdateById 修改
+	UpdateById(ctx *gin.Context)
+
+	// DeleteById 根据id删除
+	DeleteById(ctx *gin.Context)
+
+	// DeleteBatchIds 根据id集合删除
+	DeleteBatchIds(ctx *gin.Context)
+}

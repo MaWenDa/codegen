@@ -1,0 +1,49 @@
+package interfaces
+
+import (
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/pkg/db"
+	"gorm.io/gorm"
+)
+
+type {{.ModelName}}Dao interface {
+
+	// SelectById 根据id获取
+	SelectById(id string) *model.{{.ModelName}}
+
+	// SelectBatchIds 根据id集合查询
+	SelectBatchIds(ids *[]string) *[]model.{{.ModelName}}
+
+	// SelectList 查询列表
+	SelectList({{.ModelNameHump}} *model.{{.ModelName}}) *[]model.{{.ModelName}}
+
+	// SelectCount 查询数量
+	SelectCount({{.ModelNameHump}} *model.{{.ModelName}}) int64
+
+	// SelectPage 分页查询
+	SelectPage({{.ModelNameHump}} *model.{{.ModelName}}, current, size int) *[]model.{{.ModelName}}
+
+	// Insert 插入
+	Insert({{.ModelNameHump}} *model.{{.ModelName}}) bool
+
+	// InsertBatchesByLength 批量插入
+	InsertBatchesByLength({{.ModelNameHump}} []*model.{{.ModelName}}, length int) bool
+
+	// UpdateById 修改
+	UpdateById({{.ModelNameHump}} *model.{{.ModelName}}) bool
+
+	// DeleteById 根据id删除
+	DeleteById(id string) bool
+
+	// DeleteBatchIds 根据id集合删除
+	DeleteBatchIds(ids []string) bool
+
+	// StructureWhere 构建Where
+	StructureWhere({{.ModelNameHump}} *model.{{.ModelName}}) *gorm.DB
+
+	// StructureSession 构建Session
+	StructureSession() *gorm.DB
+
+	// StructureSessionByClient 构建Session
+	StructureSessionByClient(client *db.Client) *gorm.DB
+}

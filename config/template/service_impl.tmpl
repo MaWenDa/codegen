@@ -1,0 +1,72 @@
+package {{.TableName}}
+
+import (
+	"{{.ProjectName}}/api/define"
+	errs "{{.ProjectName}}/api/error"
+	dao "{{.ProjectName}}/dao/interfaces"
+	"{{.ProjectName}}/model"
+	"{{.ProjectName}}/pkg/server/api"
+)
+
+func New(dd dao.{{.ModelName}}Dao) (*Service, error) {
+	return &Service{
+		{{.ModelNameHump}}Dao: dd,
+	}, nil
+}
+
+type Service struct {
+	{{.ModelNameHump}}Dao dao.{{.ModelName}}Dao
+}
+
+// SelectPage 分页查询
+func (service *Service) SelectPage(pageReq *define.BasePageRequest, {{.ModelNameHump}} *model.{{.ModelName}}) (*define.BasePageResponse, api.Error) {
+
+	// 校验分页参数
+	pageReq.Size, pageReq.Current = define.VerifyLimit(pageReq.Size, pageReq.Current)
+
+	// 初始化响应数据
+	pageResp := &define.BasePageResponse{List: make([]model.{{.ModelName}}, 0)}
+	pageResp.Size = pageReq.Size
+	pageResp.Current = pageReq.Current
+
+	// 查询总数
+	pageResp.Total = service.{{.ModelNameHump}}Dao.SelectCount({{.ModelNameHump}})
+	if pageResp.Total == 0 {
+		return pageResp, nil
+	}
+
+	// 分页查询
+	pageResp.List = service.{{.ModelNameHump}}Dao.SelectPage({{.ModelNameHump}}, pageReq.Current, pageReq.Size)
+
+	return pageResp, nil
+}
+
+// SelectById 根据id获取
+func (service *Service) SelectById(id string) (*model.{{.ModelName}}, api.Error) {
+	return service.{{.ModelNameHump}}Dao.SelectById(id), nil
+}
+
+// SelectList 查询列表
+func (service *Service) SelectList({{.ModelNameHump}} *model.{{.ModelName}}) (*[]model.{{.ModelName}}, api.Error) {
+	return service.{{.ModelNameHump}}Dao.SelectList({{.ModelNameHump}}), nil
+}
+
+// Insert 插入
+func (service *Service) Insert({{.ModelNameHump}} *model.{{.ModelName}}) (bool, api.Error) {
+	return service.{{.ModelNameHump}}Dao.Insert({{.ModelNameHump}}), nil
+}
+
+// UpdateById 修改
+func (service *Service) UpdateById({{.ModelNameHump}} *model.{{.ModelName}}) (bool, api.Error) {
+	return service.{{.ModelNameHump}}Dao.UpdateById({{.ModelNameHump}}), nil
+}
+
+// DeleteById 根据id删除
+func (service *Service) DeleteById(id string) (bool, api.Error) {
+	return service.{{.ModelNameHump}}Dao.DeleteById(id), nil
+}
+
+// DeleteBatchIds 根据id集合删除
+func (service *Service) DeleteBatchIds(ids []string) (bool, api.Error) {
+	return service.{{.ModelNameHump}}Dao.DeleteBatchIds(ids), nil
+}
