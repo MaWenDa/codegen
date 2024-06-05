@@ -4,6 +4,8 @@
 
 集成gin、gorm、mysql、text/template实现生成go web代码，提高开发效率。
 
+作者还在学习阶段，项目结构尚在完善中，参考Java Web开发模式，待完善。
+
 #### 软件架构
 
 软件架构说明
