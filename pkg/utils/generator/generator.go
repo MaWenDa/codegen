@@ -65,6 +65,18 @@ func MapDBTypeToGo(dbType string) string {
 	}
 }
 
+// GetCheckEmptyValue 获取空值检查的值
+func GetCheckEmptyValue(dataType string) string {
+	switch dataType {
+	case "int", "int64", "float32", "float64":
+		return "0"
+	case "time.Time":
+		return "time.Time{}"
+	default:
+		return "\"\""
+	}
+}
+
 // GeneratorCodeTemplateFilling 模板数据填充
 func GeneratorCodeTemplateFilling(data interface{}, filePath, templatePath string) bool {
 	// 解析模板文件

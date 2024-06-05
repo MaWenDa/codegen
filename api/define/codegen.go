@@ -34,6 +34,7 @@ type ColumnModel struct {
 	ColumnType      string `gorm:"-"`                     // 字段类型
 	ColumnNameHump  string `gorm:"-"`                     // 列名驼峰命名
 	ModelNameHump   string `gorm:"-"`                     // 结构体驼峰命名
+	CheckEmpty      string `gorm:"-"`                     // 判断空值
 }
 
 // DataSourceTablePageRequest 数据源表列表请求

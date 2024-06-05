@@ -132,17 +132,18 @@ func (service *Service) GeneratorCode(ctx *gin.Context, req *define.GeneratorCod
 			Where("table_schema = (select database())").
 			Where("table_name = ?", tableModel.TableName).
 			Find(&tableModel.ColumnModels)
+
 		// 对表字段信息封装
 		for i := range tableModel.ColumnModels {
 			tableModel.ColumnModels[i].ColumnModelName = generatorUtils.ConvertToCamelCase(tableModel.ColumnModels[i].ColumnName)
 			tableModel.ColumnModels[i].ColumnType = generatorUtils.MapDBTypeToGo(tableModel.ColumnModels[i].DataType)
 			tableModel.ColumnModels[i].ColumnNameHump = generatorUtils.ConvertToHump(tableModel.ColumnModels[i].ColumnName)
 			tableModel.ColumnModels[i].ModelNameHump = tableModel.ModelNameHump
+			tableModel.ColumnModels[i].CheckEmpty = generatorUtils.GetCheckEmptyValue(tableModel.ColumnModels[i].ColumnType)
 		}
 
 		// 生成代码
 		generatorCode(&tableModel)
-
 	}
 
 	return nil

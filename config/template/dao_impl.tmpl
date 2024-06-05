@@ -185,9 +185,8 @@ func (dao *Dao) StructureSessionByClient(client *db.Client) *gorm.DB {
 func (dao *Dao) StructureWhere({{.ModelNameHump}} *model.{{.ModelName}}) *gorm.DB {
 
 	session := dao.StructureSession()
-
     {{ range .ColumnModels }}
-	if {{.ModelNameHump}}.{{.ColumnModelName}} != '' {
+	if {{.ModelNameHump}}.{{.ColumnModelName}} != {{.CheckEmpty}} {
 		session.Where("{{.ColumnName}} = ?", {{.ModelNameHump}}.{{.ColumnModelName}})
 	}
     {{ end }}
